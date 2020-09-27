@@ -14,7 +14,7 @@ from typing import (
 from .libs import jieba
 
 # Global variables
-chinese_regex_obj = jieba.re_han_default
+chinese_regex_obj = re.compile("[\u4E00-\u9FD5]+", re.U)
 search_limit = 20000
 file_size_limit = 4194304
 settings = None  # type: Optional[sublime.Settings]
@@ -28,6 +28,13 @@ highlight_on_gutter = False
 gutter_icon_type = ""
 search_flags = 0
 draw_flags = sublime.DRAW_NO_FILL
+
+# fmt: off
+punctuation_regex_chars = (
+    r"./\\()\"'_\-:,.;<>~!@#$%^&*|+=\[\]{}`~?"
+    r"＜＞（）［］｛｝「」『』〈〉《》【】‘’“”＂＋－＊／，。、．‧・･·﹣：；～！？＠＃＄％︿＆｜＝"
+)
+# fmt: on
 
 color_highlight_scopes = [
     "entity.name.class",
@@ -112,8 +119,8 @@ def get_word_regex(word: str, is_whole_word: bool = False) -> str:
     if not word:
         return ""
 
-    regex_l = r"(?<=\W)" if is_whole_word else ""
-    regex_r = r"(?=\W)" if is_whole_word else ""
+    regex_l = r"(?<=[\W\s{}])".format(punctuation_regex_chars) if is_whole_word else ""
+    regex_r = r"(?=[\W\s{}])".format(punctuation_regex_chars) if is_whole_word else ""
 
     if chinese_regex_obj.match(word[0]):
         regex_l = ""
