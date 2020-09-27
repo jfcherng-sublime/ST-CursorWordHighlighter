@@ -2,13 +2,22 @@ import re
 import sublime
 import sublime_plugin
 
-from . import jieba
+from typing import (
+    Any,
+    cast,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+)
+
+from .libs import jieba
 
 # Global variables
 chinese_regex_obj = jieba.re_han_default
 search_limit = 20000
 file_size_limit = 4194304
-settings = {}
+settings = None  # type: Optional[sublime.Settings]
 word_separators = ""
 highlighter_enabled = True
 case_sensitive = True
@@ -39,27 +48,31 @@ color_highlight_scopes = [
 
 
 def plugin_loaded() -> None:
-    get_settings().add_on_change("Preferences-reload", get_settings)
+    global settings
+
+    settings = sublime.load_settings("Preferences.sublime-settings")
+
+    settings.add_on_change("Preferences-reload", update_settings)
     sublime.set_timeout_async(jieba.initialize, 0)
 
 
-def get_settings() -> sublime.Settings:
+def update_settings() -> None:
     global settings, highlighter_enabled, case_sensitive, whole_word, draw_outline, color_scope
     global highlight_on_gutter, gutter_icon_type, search_flags, draw_flags, word_separators
 
-    settings = sublime.load_settings("Preferences.sublime-settings")
-    word_separators = settings.get("word_separators")
+    if not settings:
+        settings = sublime.load_settings("Preferences.sublime-settings")
+
+    word_separators = str(settings.get("word_separators", ""))
     highlighter_enabled = bool(settings.get("cursor_word_highlighter_enabled", True))
     case_sensitive = bool(settings.get("cursor_word_highlighter_case_sensitive", True))
     whole_word = bool(settings.get("cursor_word_highlighter_whole_word", True))
     draw_outline = bool(settings.get("cursor_word_highlighter_draw_outlined", True))
-    color_scope = settings.get("cursor_word_highlighter_color_scope_name", "comment")
-    highlight_on_gutter = bool(
-        settings.get("cursor_word_highlighter_mark_occurrences_on_gutter", False)
-    )
+    color_scope = str(settings.get("cursor_word_highlighter_color_scope_name", "comment"))
+    highlight_on_gutter = bool(settings.get("cursor_word_highlighter_mark_occurrences_on_gutter", False))
 
     if highlight_on_gutter:
-        gutter_icon_type = settings.get("cursor_word_highlighter_icon_type_on_gutter", "dot")
+        gutter_icon_type = str(settings.get("cursor_word_highlighter_icon_type_on_gutter", "dot"))
     else:
         gutter_icon_type = ""
 
@@ -73,10 +86,8 @@ def get_settings() -> sublime.Settings:
     else:
         draw_flags = sublime.DRAW_NO_FILL
 
-    return settings
 
-
-def get_word_by_point(view: sublime.View, pt: int) -> list:
+def get_word_by_point(view: sublime.View, pt: int) -> Tuple[sublime.Region, str]:
     word_region_st = view.word(pt)
     word_st = view.substr(word_region_st)
 
@@ -90,11 +101,11 @@ def get_word_by_point(view: sublime.View, pt: int) -> list:
         )
 
         if jieba_word_span[0] <= pt < jieba_word_span[1]:
-            return [sublime.Region(*jieba_word_span), word]
+            return (sublime.Region(*jieba_word_span), word)
 
         offset += word_len
 
-    return [sublime.Region(-1, -1), ""]
+    return (sublime.Region(-1, -1), "")
 
 
 def get_word_regex(word: str, is_whole_word: bool = False) -> str:
@@ -114,14 +125,17 @@ def get_word_regex(word: str, is_whole_word: bool = False) -> str:
 
 
 class CursorWordHighlighterListener(sublime_plugin.EventListener):
-    def on_post_text_command(self, view: sublime.View, command_name: str, args: dict) -> None:
+    def on_post_text_command(self, view: sublime.View, command_name: str, args: Optional[Dict[str, Any]]) -> None:
+        if not args:
+            args = {}
+
         if not highlighter_enabled:
             view.erase_regions("CursorWordHighlighter")
             return
 
         is_limited_size = view.size() > file_size_limit
 
-        regions = []
+        regions = []  # type: List[sublime.Region]
         processedWords = []
         occurrencesMessage = []
         occurrencesCount = 0
@@ -141,7 +155,7 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
 
                     if string not in processedWords:
                         processedWords.append(string)
-                        if string and all([not c in word_separators for c in string]):
+                        if string and all([c not in word_separators for c in string]):
                             regions = self.find_regions(
                                 view,
                                 regions,
@@ -155,32 +169,25 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
                         string = view.substr(word).strip()
                         if string not in processedWords:
                             processedWords.append(string)
-                            if string and all([not c in word_separators for c in string]):
+                            if string and all([c not in word_separators for c in string]):
                                 regions = self.find_regions(view, regions, string, is_limited_size)
 
                 occurrences = len(regions) - occurrencesCount
                 if occurrences > 0:
                     occurrencesMessage.append(
-                        str(occurrences)
-                        + " occurrence"
-                        + ("s" if occurrences != 1 else "")
-                        + ' of "'
-                        + string
-                        + '"'
+                        str(occurrences) + " occurrence" + ("s" if occurrences != 1 else "") + ' of "' + string + '"'
                     )
                     occurrencesCount = occurrencesCount + occurrences
 
             view.erase_regions("CursorWordHighlighter")
             if regions:
-                view.add_regions(
-                    "CursorWordHighlighter", regions, color_scope, gutter_icon_type, draw_flags
-                )
+                view.add_regions("CursorWordHighlighter", regions, color_scope, gutter_icon_type, draw_flags)
             else:
                 view.erase_status("CursorWordHighlighter")
 
     def find_regions(
-        self, view: sublime.View, regions: list, string: str, limited_size: int
-    ) -> list:
+        self, view: sublime.View, regions: List[sublime.Region], string: str, limited_size: int
+    ) -> List[sublime.Region]:
         search = get_word_regex(string, whole_word)
 
         if not limited_size:
@@ -206,7 +213,7 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
 
 
 class PersistentHighlightWordsCommand(sublime_plugin.WindowCommand):
-    def get_words(self, text: str) -> list:
+    def get_words(self, text: str) -> List[str]:
         return text.split()
 
     def run(self) -> None:
@@ -215,9 +222,7 @@ class PersistentHighlightWordsCommand(sublime_plugin.WindowCommand):
         if not view:
             return
 
-        word_list = self.get_words(
-            view.settings().get("cursor_word_highlighter_persistant_highlight_text", "")
-        )
+        word_list = self.get_words(str(view.settings().get("cursor_word_highlighter_persistant_highlight_text", "")))
         cursor_word = ""
         for sel in view.sel():
             if sel.empty():
@@ -242,6 +247,10 @@ class PersistentHighlightWordsCommand(sublime_plugin.WindowCommand):
         self.window.run_command("persistent_unhighlight_words")
 
         view = self.window.active_view()
+
+        if not view:
+            return
+
         words = self.get_words(text)
         size = 0
         word_set = set()
@@ -277,7 +286,9 @@ class PersistentUnhighlightWordsCommand(sublime_plugin.WindowCommand):
             return
 
         size = view.settings().get("cursor_word_highlighter_persistant_highlight_size", 0)
-        for i in range(size):
+        size = cast(int, size)  # make mypy happy
+
+        for i in range(0, size):
             view.erase_regions("cursor_word_highlighter_persistant_highlight_word_%d" % i)
 
         view.settings().set("cursor_word_highlighter_persistant_highlight_size", 0)
