@@ -1,6 +1,6 @@
 {
 	"cursor_word_highlighter_enabled" : true,
-	"cursor_word_highlighter_case_sensitive": true,
+	"cursor_word_highlighter_case_sensitive": false,
 	"cursor_word_highlighter_draw_outlined": true,
 	"cursor_word_highlighter_whole_word": false,
 	// valid types: comment, string, invalid, etc
