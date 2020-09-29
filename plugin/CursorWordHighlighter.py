@@ -29,13 +29,7 @@ highlight_on_gutter = False
 gutter_icon_type = ""
 search_flags = 0
 draw_flags = sublime.DRAW_NO_FILL
-
-# fmt: off
-punctuation_regex_chars = (
-    r"./\\()\"'_\-:,.;<>~!@#$%^&*|+=\[\]{}`~?"
-    r"＜＞（）［］｛｝「」『』〈〉《》【】‘’“”＂＋－＊／，。、．‧・･·﹣：；～！？＠＃＄％︿＆｜＝"
-)
-# fmt: on
+min_active_length = 1
 
 color_highlight_scopes = [
     "entity.name.class",
@@ -46,7 +40,7 @@ color_highlight_scopes = [
     "string",
 ]
 
-# 1就在今天進行測試bbb，你好嗎
+# 1就在今天進行測試了bbb，你好嗎
 # bbb-b測試bbbasdbn
 # ggg測試ascxias
 # 測試你好嗎
@@ -67,7 +61,7 @@ def set_up() -> None:
 def update_settings() -> None:
     global settings, highlighter_enabled, case_sensitive, whole_word, draw_outline, color_scope
     global highlight_on_gutter, gutter_icon_type, search_flags, draw_flags
-    global word_separators, word_separators_re_escaped
+    global word_separators, word_separators_re_escaped, min_active_length
 
     if not settings:
         settings = sublime.load_settings("Preferences.sublime-settings")
@@ -81,6 +75,7 @@ def update_settings() -> None:
     draw_outline = bool(settings.get("cursor_word_highlighter_draw_outlined", True))
     color_scope = str(settings.get("cursor_word_highlighter_color_scope_name", "comment"))
     highlight_on_gutter = bool(settings.get("cursor_word_highlighter_mark_occurrences_on_gutter", False))
+    min_active_length = int(cast(int, settings.get("cursor_word_highlighter_min_active_length", 1)))
 
     if highlight_on_gutter:
         gutter_icon_type = str(settings.get("cursor_word_highlighter_icon_type_on_gutter", "dot"))
@@ -173,7 +168,7 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
                         if string and all([c not in word_separators for c in string]):
                             regions = self.find_regions(view, regions, string, is_limited_size)
 
-                elif not sel.empty():
+                else:
                     word = view.word(sel)
                     if word.end() == sel.end() and word.begin() == sel.begin():
                         string = view.substr(word).strip()
@@ -181,6 +176,10 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
                             processedWords.append(string)
                             if string and all([c not in word_separators for c in string]):
                                 regions = self.find_regions(view, regions, string, is_limited_size)
+
+                if len(string) < min_active_length:
+                    regions = []
+                    continue
 
                 occurrences = len(regions) - occurrencesCount
                 if occurrences > 0:
@@ -243,12 +242,16 @@ class PersistentHighlightWordsCommand(sublime_plugin.WindowCommand):
             else:
                 cursor_word = view.substr(sel).strip()
 
-            if cursor_word:
-                if cursor_word in word_list:
-                    word_list.remove(cursor_word)
-                else:
-                    word_list.append(cursor_word)
-                break
+            if len(cursor_word) < min_active_length:
+                cursor_word = ""
+                continue
+
+            if cursor_word in word_list:
+                word_list.remove(cursor_word)
+            else:
+                word_list.append(cursor_word)
+
+            break
 
         display_list = " ".join(word_list)
         self.highlight(display_list)
@@ -265,7 +268,7 @@ class PersistentHighlightWordsCommand(sublime_plugin.WindowCommand):
         size = 0
         word_set = set()
         for word in words:
-            if len(word) < 1 or word in word_set:
+            if len(word) < min_active_length or word in word_set:
                 continue
 
             word_set.add(word)
@@ -295,9 +298,7 @@ class PersistentUnhighlightWordsCommand(sublime_plugin.WindowCommand):
         if not view:
             return
 
-        size = view.settings().get("cursor_word_highlighter_persistant_highlight_size", 0)
-        size = cast(int, size)  # make mypy happy
-
+        size = int(cast(int, view.settings().get("cursor_word_highlighter_persistant_highlight_size", 0)))
         for i in range(0, size):
             view.erase_regions("cursor_word_highlighter_persistant_highlight_word_%d" % i)
 

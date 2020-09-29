@@ -8,4 +8,5 @@
     "cursor_word_highlighter_mark_occurrences_on_gutter": false,
     // valid types: dot, circle, bookmark and cross
     "cursor_word_highlighter_icon_type_on_gutter": "dot",
+    "cursor_word_highlighter_min_active_length": 2,
 }
