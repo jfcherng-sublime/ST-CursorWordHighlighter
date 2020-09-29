@@ -1,5 +1,6 @@
 from . import CursorWordHighlighter
 
+
 def set_up() -> None:
     """ plugin_loaded """
 
