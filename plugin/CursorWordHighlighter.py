@@ -19,6 +19,7 @@ search_limit = 20000
 file_size_limit = 4194304
 settings = None  # type: Optional[sublime.Settings]
 word_separators = ""
+word_separators_re_escaped = ""
 highlighter_enabled = True
 case_sensitive = True
 whole_word = True
@@ -46,7 +47,7 @@ color_highlight_scopes = [
 ]
 
 # 1就在今天進行測試bbb，你好嗎
-# bbbb測試asdbn
+# bbb-b測試bbbasdbn
 # ggg測試ascxias
 # 測試你好嗎
 # 你好嗎
@@ -54,7 +55,7 @@ color_highlight_scopes = [
 # 測試
 
 
-def plugin_loaded() -> None:
+def set_up() -> None:
     global settings
 
     settings = sublime.load_settings("Preferences.sublime-settings")
@@ -65,12 +66,15 @@ def plugin_loaded() -> None:
 
 def update_settings() -> None:
     global settings, highlighter_enabled, case_sensitive, whole_word, draw_outline, color_scope
-    global highlight_on_gutter, gutter_icon_type, search_flags, draw_flags, word_separators
+    global highlight_on_gutter, gutter_icon_type, search_flags, draw_flags
+    global word_separators, word_separators_re_escaped
 
     if not settings:
         settings = sublime.load_settings("Preferences.sublime-settings")
 
     word_separators = str(settings.get("word_separators", ""))
+    word_separators_re_escaped = re.escape(word_separators)
+
     highlighter_enabled = bool(settings.get("cursor_word_highlighter_enabled", True))
     case_sensitive = bool(settings.get("cursor_word_highlighter_case_sensitive", True))
     whole_word = bool(settings.get("cursor_word_highlighter_whole_word", True))
@@ -119,8 +123,12 @@ def get_word_regex(word: str, is_whole_word: bool = False) -> str:
     if not word:
         return ""
 
-    regex_l = r"(?<=[\W\s{}])".format(punctuation_regex_chars) if is_whole_word else ""
-    regex_r = r"(?=[\W\s{}])".format(punctuation_regex_chars) if is_whole_word else ""
+    if is_whole_word:
+        regex_l = "(?<=[\\s{}]|[^\u0001-\u007f])".format(word_separators_re_escaped)
+        regex_r = "(?=[\\s{}]|[^\u0001-\u007f])".format(word_separators_re_escaped)
+    else:
+        regex_l = ""
+        regex_r = ""
 
     if chinese_regex_obj.match(word[0]):
         regex_l = ""
@@ -163,12 +171,7 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
                     if string not in processedWords:
                         processedWords.append(string)
                         if string and all([c not in word_separators for c in string]):
-                            regions = self.find_regions(
-                                view,
-                                regions,
-                                string,
-                                is_limited_size,
-                            )
+                            regions = self.find_regions(view, regions, string, is_limited_size)
 
                 elif not sel.empty():
                     word = view.word(sel)
