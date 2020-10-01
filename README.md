@@ -13,10 +13,10 @@ It also supports persistent keyword highlight with hotkey assigned
 
 ## Installation
 
-Use `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) to open command palette,
-input `Browse Packages` to open the packages folder, or via menu `Preferences` > `Browse Packages`
-
-Under the `Packages` folder, either copy files to `User` folder or create a new `CursorWordHighlighter` folder.
+1. This plugin is not published on the official Package Control.
+   To install, add a custom repository for Package Control with steps described
+   [here](https://github.com/jfcherng-sublime/ST-my-package-control/blob/master/README.md#usage).
+1. Install `CursorWordHighlighter` via Package Control.
 
 ## Options
 
