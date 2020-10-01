@@ -1,3 +1,4 @@
+import jieba
 import re
 import sublime
 import sublime_plugin
@@ -11,7 +12,6 @@ from typing import (
     Tuple,
 )
 
-from .libs import jieba
 
 # Global variables
 chinese_regex_obj = re.compile("[\u4E00-\u9FD5]+", re.U)
