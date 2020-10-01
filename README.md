@@ -2,7 +2,7 @@
 
 A Word Highlighter plug-in.
 
-![CursorWordHighlighter][1]
+![CursorWordHighlighter][screenshot]
 
 ## Introduction
 
@@ -63,7 +63,7 @@ Actually all what I've done is combining 2 plugins together in my preferable way
 
 I also wrote a [blog][5] for this, but it's in Chinese, check it out if you are interested.
 
-[1]: http://www.ownself.org/blog/wp-content/uploads/2014/08/CursorWordHighlighter.png
+[screenshot]: https://raw.githubusercontent.com/jfcherng-sublime/ST-CursorWordHighlighter/chinese/docs/images/screenshot.png
 [2]: https://github.com/SublimeText/WordHighlight
 [3]: https://github.com/seanliang/HighlightWords
 [4]: http://weibo.com/seanliang
