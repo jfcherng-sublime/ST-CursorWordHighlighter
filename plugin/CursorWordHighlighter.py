@@ -59,6 +59,10 @@ def set_up() -> None:
     sublime.set_timeout_async(jieba.initialize, 0)
 
 
+def tear_down() -> None:
+    pass
+
+
 def update_settings() -> None:
     global settings, highlighter_enabled, case_sensitive, whole_word, draw_outline, color_scope
     global highlight_on_gutter, gutter_icon_type, search_flags, draw_flags

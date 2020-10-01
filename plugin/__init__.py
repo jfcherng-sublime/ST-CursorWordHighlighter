@@ -10,4 +10,4 @@ def set_up() -> None:
 def tear_down() -> None:
     """ plugin_unloaded """
 
-    pass
+    CursorWordHighlighter.tear_down()
