@@ -20,41 +20,41 @@ It also supports persistent keyword highlight with hotkey assigned
 
 ## Options
 
-- `"cursor_word_highlighter_enabled": true,`
+- `"enabled": true,`
 
-  Enable or disable this plugin
+  Enable or disable this plugin.
 
-- `"cursor_word_highlighter_case_sensitive": true,`
+- `"case_sensitive": true,`
 
-  Case sensitive or not
+  Case sensitive or not.
 
-- `"cursor_word_highlighter_draw_outlined": true,`
+- `"draw_outlined": true,`
 
   2 sytle of highlight has been provided, with draw outlined,
   plugin will only draw a outline instead of filling the words, vice versa.
 
-- `"cursor_word_highlighter_color_scope_name": "comment",`
+- `"color_scope_name": "comment",`
 
-  This decide the color of highlight, options are`comment`, `string`,`invalid`, etc.
-  You can reach them in your .tmTheme file.
+  This decide the color of highlight, options are`"comment"`, `"string"`,`"invalid"`, etc.
+  You can reach them in your `.tmTheme` or `.sublime-color-scheme` file.
 
-- `"cursor_word_highlighter_mark_occurrences_on_gutter": false,`
+- `"mark_occurrences_on_gutter": false,`
 
   If this comes true, it also marks all occurrences of highlighted words on the gutter bar.
-  To customize the icons, the property `cursor_word_highlighter_icon_type_on_gutter` is helpful.
+  To customize the icons, the property `icon_type_on_gutter` is helpful.
 
-- `"cursor_word_highlighter_icon_type_on_gutter": dot,`
+- `"icon_type_on_gutter": "dot",`
 
-  4 valid types: dot, circle, bookmark and cross.
+  Valid values: `"dot"`, `"circle"`, `"bookmark"` and `"cross"`.
 
-- `"cursor_word_highlighter_min_active_length": 2,`
+- `"min_active_length": 2,`
 
   It's very likely that you don't want to highlight short words, such as a "word" which has only one character.
   In that case, we have this constrain which requires the word is at least 2-char.
 
-- `"cursor_word_highlighter_min_active_length_persist": 1,`
+- `"min_active_length_persistent": 1,`
 
-  Like `cursor_word_highlighter_min_active_length` but for persistent highlighting.
+  Like `min_active_length` but for persistent highlighting.
 
 ## Acknowledgment
 

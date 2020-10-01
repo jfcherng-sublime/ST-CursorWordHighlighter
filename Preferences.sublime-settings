@@ -1,13 +1,13 @@
 {
-    "cursor_word_highlighter_enabled": true,
-    "cursor_word_highlighter_case_sensitive": false,
-    "cursor_word_highlighter_draw_outlined": true,
-    "cursor_word_highlighter_whole_word": false,
+    "enabled": true,
+    "case_sensitive": false,
+    "draw_outlined": true,
+    "whole_word": false,
     // valid types: comment, string, invalid, etc
-    "cursor_word_highlighter_color_scope_name": "comment",
-    "cursor_word_highlighter_mark_occurrences_on_gutter": false,
+    "color_scope_name": "comment",
+    "mark_occurrences_on_gutter": false,
     // valid types: dot, circle, bookmark and cross
-    "cursor_word_highlighter_icon_type_on_gutter": "dot",
-    "cursor_word_highlighter_min_active_length": 2,
-    "cursor_word_highlighter_min_active_length_persist": 1,
+    "icon_type_on_gutter": "dot",
+    "min_active_length": 2,
+    "min_active_length_persist": 1,
 }

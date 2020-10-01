@@ -30,7 +30,7 @@ gutter_icon_type = ""
 search_flags = 0
 draw_flags = sublime.DRAW_NO_FILL
 min_active_length = 2
-min_active_length_persist = 1
+min_active_length_persistent = 1
 
 color_highlight_scopes = [
     "entity.name.class",
@@ -67,7 +67,7 @@ def update_settings() -> None:
     global settings, highlighter_enabled, case_sensitive, whole_word, draw_outline, color_scope
     global highlight_on_gutter, gutter_icon_type, search_flags, draw_flags
     global word_separators, word_separators_re_escaped
-    global min_active_length, min_active_length_persist
+    global min_active_length, min_active_length_persistent
 
     if not settings:
         settings = sublime.load_settings("Preferences.sublime-settings")
@@ -75,17 +75,17 @@ def update_settings() -> None:
     word_separators = str(settings.get("word_separators", ""))
     word_separators_re_escaped = re.escape(word_separators)
 
-    highlighter_enabled = bool(settings.get("cursor_word_highlighter_enabled", True))
-    case_sensitive = bool(settings.get("cursor_word_highlighter_case_sensitive", True))
-    whole_word = bool(settings.get("cursor_word_highlighter_whole_word", True))
-    draw_outline = bool(settings.get("cursor_word_highlighter_draw_outlined", True))
-    color_scope = str(settings.get("cursor_word_highlighter_color_scope_name", "comment"))
-    highlight_on_gutter = bool(settings.get("cursor_word_highlighter_mark_occurrences_on_gutter", False))
-    min_active_length = int(cast(int, settings.get("cursor_word_highlighter_min_active_length", 2)))
-    min_active_length_persist = int(cast(int, settings.get("cursor_word_highlighter_min_active_length_persist", 1)))
+    highlighter_enabled = bool(settings.get("enabled", True))
+    case_sensitive = bool(settings.get("case_sensitive", True))
+    whole_word = bool(settings.get("whole_word", True))
+    draw_outline = bool(settings.get("draw_outlined", True))
+    color_scope = str(settings.get("color_scope_name", "comment"))
+    highlight_on_gutter = bool(settings.get("mark_occurrences_on_gutter", False))
+    min_active_length = int(cast(int, settings.get("min_active_length", 2)))
+    min_active_length_persistent = int(cast(int, settings.get("min_active_length_persistent", 1)))
 
     if highlight_on_gutter:
-        gutter_icon_type = str(settings.get("cursor_word_highlighter_icon_type_on_gutter", "dot"))
+        gutter_icon_type = str(settings.get("icon_type_on_gutter", "dot"))
     else:
         gutter_icon_type = ""
 
@@ -234,7 +234,7 @@ class PersistentHighlightWordsCommand(sublime_plugin.WindowCommand):
         if not view:
             return
 
-        word_list = self.get_words(str(view.settings().get("cursor_word_highlighter_persistant_highlight_text", "")))
+        word_list = self.get_words(str(view.settings().get("persistant_highlight_text", "")))
         cursor_word = ""
         for sel in view.sel():
             if sel.empty():
@@ -245,7 +245,7 @@ class PersistentHighlightWordsCommand(sublime_plugin.WindowCommand):
             else:
                 cursor_word = view.substr(sel).strip()
 
-            if len(cursor_word) < min_active_length_persist:
+            if len(cursor_word) < min_active_length_persistent:
                 cursor_word = ""
                 continue
 
@@ -271,7 +271,7 @@ class PersistentHighlightWordsCommand(sublime_plugin.WindowCommand):
         size = 0
         word_set = set()
         for word in words:
-            if len(word) < min_active_length_persist or word in word_set:
+            if len(word) < min_active_length_persistent or word in word_set:
                 continue
 
             word_set.add(word)
@@ -301,7 +301,7 @@ class PersistentUnhighlightWordsCommand(sublime_plugin.WindowCommand):
         if not view:
             return
 
-        size = int(cast(int, view.settings().get("cursor_word_highlighter_persistant_highlight_size", 0)))
+        size = int(cast(int, view.settings().get("persistant_highlight_size", 0)))
         for i in range(0, size):
             view.erase_regions("cursor_word_highlighter_persistant_highlight_word_%d" % i)
 
