@@ -146,6 +146,9 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
         region_key = "cursor_word_highlighter"
         status_key = "cursor_word_highlighter_text_command_msg"
 
+        view.erase_regions(region_key)
+        view.erase_status(status_key)
+
         if not args:
             args = {}
 
@@ -165,8 +168,6 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
             or command_name == "move"
             or (command_name == "set_motion" and "move" in args["motion"])
         ):
-            view.erase_status(status_key)
-
             if sel_0.empty():
                 word_jieba = get_word_by_point(view, sel_0.b)[1]
             else:
@@ -193,9 +194,7 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
                     '{} occurrence(s) of "{}"'.format(occurrencesCount, word_jieba),
                 )
 
-            view.erase_regions(region_key)
-            if regions:
-                view.add_regions(region_key, regions, color_scope, gutter_icon_type, draw_flags)
+            view.add_regions(region_key, regions, color_scope, gutter_icon_type, draw_flags)
 
     def find_regions(
         self, view: sublime.View, regions: List[sublime.Region], string: str, limited_size: int
