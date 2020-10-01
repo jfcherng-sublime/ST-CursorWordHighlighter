@@ -18,7 +18,7 @@ It also supports persistent keyword highlight with hotkey assigned
    [here](https://github.com/jfcherng-sublime/ST-my-package-control/blob/master/README.md#usage).
 1. Install `CursorWordHighlighter` via Package Control.
 
-## Options
+## Settings
 
 - `"enabled": true,`
 
