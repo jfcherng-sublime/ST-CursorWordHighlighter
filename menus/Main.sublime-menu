@@ -1,0 +1,48 @@
+[
+    {
+        "id": "preferences",
+        "children": [
+            {
+                "id": "package-settings",
+                "children": [
+                    {
+                        "caption": "CursorWordHighlighter",
+                        "children": [
+                            {
+                                "caption": "-",
+                            },
+                            {
+                                "caption": "Settings",
+                                "command": "edit_settings",
+                                "args": {
+                                    "base_file": "${packages}/CursorWordHighlighter/Preferences.sublime-settings",
+                                    "default": "{\n\t$0\n}\n",
+                                },
+                            },
+                            {
+                                "caption": "-",
+                            },
+                            {
+                                "caption": "README",
+                                "command": "open_file",
+                                "args": {
+                                    "file": "${packages}/CursorWordHighlighter/README.md",
+                                },
+                            },
+                            {
+                                "caption": "CHANGELOG",
+                                "command": "open_file",
+                                "args": {
+                                    "file": "${packages}/CursorWordHighlighter/CHANGELOG.md",
+                                },
+                            },
+                            {
+                                "caption": "-",
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+]
