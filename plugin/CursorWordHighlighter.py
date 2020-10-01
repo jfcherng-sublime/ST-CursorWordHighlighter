@@ -143,24 +143,23 @@ def get_word_regex(word: str, is_whole_word: bool = False) -> str:
 
 class CursorWordHighlighterListener(sublime_plugin.EventListener):
     def on_post_text_command(self, view: sublime.View, command_name: str, args: Optional[Dict[str, Any]]) -> None:
+        region_key = "cursor_word_highlighter"
         status_key = "cursor_word_highlighter_text_command_msg"
 
         if not args:
             args = {}
 
-        if not highlighter_enabled:
-            view.erase_regions("CursorWordHighlighter")
-            return
-
-        # only work for single cursor
-        if len(view.sel()) != 1:
+        if (
+            not highlighter_enabled
+            # only work for single cursor
+            or len(view.sel()) != 1
+        ):
+            view.erase_regions(region_key)
             return
 
         sel_0 = view.sel()[0]
         is_limited_size = view.size() > file_size_limit
 
-        occurrencesMessage = []
-        occurrencesCount = 0
         if (
             command_name == "drag_select"
             or command_name == "move"
@@ -193,9 +192,9 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
                     status_key, '{} occurrence(s) of "{}"'.format(occurrencesCount, word_jieba),
                 )
 
-            view.erase_regions("CursorWordHighlighter")
+            view.erase_regions(region_key)
             if regions:
-                view.add_regions("CursorWordHighlighter", regions, color_scope, gutter_icon_type, draw_flags)
+                view.add_regions(region_key, regions, color_scope, gutter_icon_type, draw_flags)
 
     def find_regions(
         self, view: sublime.View, regions: List[sublime.Region], string: str, limited_size: int
