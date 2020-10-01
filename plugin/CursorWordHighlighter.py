@@ -143,6 +143,8 @@ def get_word_regex(word: str, is_whole_word: bool = False) -> str:
 
 class CursorWordHighlighterListener(sublime_plugin.EventListener):
     def on_post_text_command(self, view: sublime.View, command_name: str, args: Optional[Dict[str, Any]]) -> None:
+        status_key = "cursor_word_highlighter_text_command_msg"
+
         if not args:
             args = {}
 
@@ -150,10 +152,13 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
             view.erase_regions("CursorWordHighlighter")
             return
 
+        # only work for single cursor
+        if len(view.sel()) != 1:
+            return
+
+        sel_0 = view.sel()[0]
         is_limited_size = view.size() > file_size_limit
 
-        regions = []  # type: List[sublime.Region]
-        processedWords = []
         occurrencesMessage = []
         occurrencesCount = 0
         if (
@@ -161,36 +166,36 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
             or command_name == "move"
             or (command_name == "set_motion" and "move" in args["motion"])
         ):
-            for sel in view.sel():
-                string = ""
+            view.erase_status(status_key)
 
-                if sel.empty():
-                    string = get_word_by_point(view, sel.b)[1]
+            if sel_0.empty():
+                word_jieba = get_word_by_point(view, sel_0.b)[1]
+            else:
+                word_region_st = view.word(sel_0)
+
+                if word_region_st.begin() == sel_0.begin() and word_region_st.end() == sel_0.end():
+                    word_jieba = view.substr(word_region_st)
                 else:
-                    word = view.word(sel)
-                    if word.end() == sel.end() and word.begin() == sel.begin():
-                        string = view.substr(word)
+                    word_jieba = ""
 
-                string = string.strip()
+            word_jieba = word_jieba.strip()
 
-                if len(string) < min_active_length:
-                    continue
+            if not word_jieba or len(word_jieba) < min_active_length:
+                return
 
-                if string not in processedWords:
-                    processedWords.append(string)
-                    if string and all(char not in word_separators for char in string):
-                        regions = self.find_regions(view, regions, string, is_limited_size)
+            regions = []  # type: List[sublime.Region]
+            if all(char not in word_separators for char in word_jieba):
+                regions = self.find_regions(view, regions, word_jieba, is_limited_size)
 
-                occurrences = len(regions) - occurrencesCount
-                if occurrences > 0:
-                    occurrencesMessage.append('{} occurrence(s) of "{}"'.format(occurrences, string))
-                    occurrencesCount = occurrencesCount + occurrences
+            occurrencesCount = len(regions)
+            if occurrencesCount > 0:
+                view.set_status(
+                    status_key, '{} occurrence(s) of "{}"'.format(occurrencesCount, word_jieba),
+                )
 
             view.erase_regions("CursorWordHighlighter")
             if regions:
                 view.add_regions("CursorWordHighlighter", regions, color_scope, gutter_icon_type, draw_flags)
-            else:
-                view.erase_status("CursorWordHighlighter")
 
     def find_regions(
         self, view: sublime.View, regions: List[sublime.Region], string: str, limited_size: int
@@ -266,7 +271,7 @@ class PersistentHighlightWordsCommand(sublime_plugin.WindowCommand):
         size = 0
         word_set = set()
         for word in words:
-            if len(word) < min_active_length or word in word_set:
+            if len(word) < min_active_length_persist or word in word_set:
                 continue
 
             word_set.add(word)
