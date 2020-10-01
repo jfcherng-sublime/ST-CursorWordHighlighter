@@ -1,4 +1,6 @@
 .dependabot export-ignore
+.editorconfig export-ignore
+.flake8 export-ignore
 .gitattributes export-ignore
 .github/ export-ignore
 .gitignore export-ignore
