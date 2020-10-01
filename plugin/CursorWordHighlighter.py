@@ -159,7 +159,6 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
             # only work for single cursor
             or len(view.sel()) != 1
         ):
-            view.erase_regions(region_key)
             return
 
         sel_0 = view.sel()[0]
@@ -235,7 +234,7 @@ class PersistentHighlightWordsCommand(sublime_plugin.WindowCommand):
         if not view:
             return
 
-        word_list = self.get_words(str(view.settings().get("persistant_highlight_text", "")))
+        word_list = self.get_words(str(view.settings().get("cursor_word_highlighter_persistant_highlight_text", "")))
         cursor_word = ""
         for sel in view.sel():
             if sel.empty():
@@ -302,7 +301,7 @@ class PersistentUnhighlightWordsCommand(sublime_plugin.WindowCommand):
         if not view:
             return
 
-        size = int(cast(int, view.settings().get("persistant_highlight_size", 0)))
+        size = int(cast(int, view.settings().get("cursor_word_highlighter_persistant_highlight_size", 0)))
         for i in range(0, size):
             view.erase_regions("cursor_word_highlighter_persistant_highlight_word_%d" % i)
 
