@@ -166,33 +166,24 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
 
                 if sel.empty():
                     string = get_word_by_point(view, sel.b)[1]
-
-                    if not string.strip():
-                        continue
-
-                    if string not in processedWords:
-                        processedWords.append(string)
-                        if string and all([c not in word_separators for c in string]):
-                            regions = self.find_regions(view, regions, string, is_limited_size)
-
                 else:
                     word = view.word(sel)
                     if word.end() == sel.end() and word.begin() == sel.begin():
-                        string = view.substr(word).strip()
-                        if string not in processedWords:
-                            processedWords.append(string)
-                            if string and all([c not in word_separators for c in string]):
-                                regions = self.find_regions(view, regions, string, is_limited_size)
+                        string = view.substr(word)
+
+                string = string.strip()
 
                 if len(string) < min_active_length:
-                    regions = []
                     continue
+
+                if string not in processedWords:
+                    processedWords.append(string)
+                    if string and all(char not in word_separators for char in string):
+                        regions = self.find_regions(view, regions, string, is_limited_size)
 
                 occurrences = len(regions) - occurrencesCount
                 if occurrences > 0:
-                    occurrencesMessage.append(
-                        str(occurrences) + " occurrence" + ("s" if occurrences != 1 else "") + ' of "' + string + '"'
-                    )
+                    occurrencesMessage.append('{} occurrence(s) of "{}"'.format(occurrences, string))
                     occurrencesCount = occurrencesCount + occurrences
 
             view.erase_regions("CursorWordHighlighter")
