@@ -168,7 +168,7 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
                     string = get_word_by_point(view, sel.b)[1]
 
                     if not string.strip():
-                        break
+                        continue
 
                     if string not in processedWords:
                         processedWords.append(string)
