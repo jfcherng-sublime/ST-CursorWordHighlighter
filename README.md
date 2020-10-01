@@ -52,6 +52,10 @@ It also supports persistent keyword highlight with hotkey assigned
   It's very likely that you don't want to highlight short words, such as a "word" which has only one character.
   In that case, we have this constrain which requires the word is at least 2-char.
 
+- `"cursor_word_highlighter_min_active_length_persist" : 1`
+
+  Like `cursor_word_highlighter_min_active_length` but for persistent highlighting.
+
 ## Acknowledgment
 
 Official `WordHighlight` plugin seems to do the similar job,

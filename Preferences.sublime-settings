@@ -9,4 +9,5 @@
     // valid types: dot, circle, bookmark and cross
     "cursor_word_highlighter_icon_type_on_gutter": "dot",
     "cursor_word_highlighter_min_active_length": 2,
+    "cursor_word_highlighter_min_active_length_persist": 1,
 }

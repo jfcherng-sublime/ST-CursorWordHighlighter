@@ -29,7 +29,8 @@ highlight_on_gutter = False
 gutter_icon_type = ""
 search_flags = 0
 draw_flags = sublime.DRAW_NO_FILL
-min_active_length = 1
+min_active_length = 2
+min_active_length_persist = 1
 
 color_highlight_scopes = [
     "entity.name.class",
@@ -61,7 +62,8 @@ def set_up() -> None:
 def update_settings() -> None:
     global settings, highlighter_enabled, case_sensitive, whole_word, draw_outline, color_scope
     global highlight_on_gutter, gutter_icon_type, search_flags, draw_flags
-    global word_separators, word_separators_re_escaped, min_active_length
+    global word_separators, word_separators_re_escaped
+    global min_active_length, min_active_length_persist
 
     if not settings:
         settings = sublime.load_settings("Preferences.sublime-settings")
@@ -75,7 +77,8 @@ def update_settings() -> None:
     draw_outline = bool(settings.get("cursor_word_highlighter_draw_outlined", True))
     color_scope = str(settings.get("cursor_word_highlighter_color_scope_name", "comment"))
     highlight_on_gutter = bool(settings.get("cursor_word_highlighter_mark_occurrences_on_gutter", False))
-    min_active_length = int(cast(int, settings.get("cursor_word_highlighter_min_active_length", 1)))
+    min_active_length = int(cast(int, settings.get("cursor_word_highlighter_min_active_length", 2)))
+    min_active_length_persist = int(cast(int, settings.get("cursor_word_highlighter_min_active_length_persist", 1)))
 
     if highlight_on_gutter:
         gutter_icon_type = str(settings.get("cursor_word_highlighter_icon_type_on_gutter", "dot"))
@@ -242,7 +245,7 @@ class PersistentHighlightWordsCommand(sublime_plugin.WindowCommand):
             else:
                 cursor_word = view.substr(sel).strip()
 
-            if len(cursor_word) < min_active_length:
+            if len(cursor_word) < min_active_length_persist:
                 cursor_word = ""
                 continue
 
