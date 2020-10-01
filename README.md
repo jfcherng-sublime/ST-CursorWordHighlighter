@@ -47,6 +47,11 @@ Under the `Packages` folder, either copy files to `User` folder or create a new 
 
   4 valid types: dot, circle, bookmark and cross.
 
+- `"cursor_word_highlighter_min_active_length" : 2`
+
+  It's very likely that you don't want to highlight short words, such as a "word" which has only one character.
+  In that case, we have this constrain which requires the word is at least 2-char.
+
 ## Acknowledgment
 
 Official `WordHighlight` plugin seems to do the similar job,
