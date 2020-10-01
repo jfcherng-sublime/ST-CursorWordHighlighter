@@ -189,7 +189,8 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
             occurrencesCount = len(regions)
             if occurrencesCount > 0:
                 view.set_status(
-                    status_key, '{} occurrence(s) of "{}"'.format(occurrencesCount, word_jieba),
+                    status_key,
+                    '{} occurrence(s) of "{}"'.format(occurrencesCount, word_jieba),
                 )
 
             view.erase_regions(region_key)
