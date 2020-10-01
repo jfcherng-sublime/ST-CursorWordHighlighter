@@ -23,6 +23,7 @@ word_separators_re_escaped = ""
 highlighter_enabled = True
 case_sensitive = True
 whole_word = True
+show_status_message = True
 draw_outline = True
 color_scope = "comment"
 highlight_on_gutter = False
@@ -64,9 +65,9 @@ def tear_down() -> None:
 
 
 def update_settings() -> None:
-    global settings, highlighter_enabled, case_sensitive, whole_word, draw_outline, color_scope
-    global highlight_on_gutter, gutter_icon_type, search_flags, draw_flags
-    global word_separators, word_separators_re_escaped
+    global settings, highlighter_enabled, case_sensitive, show_status_message
+    global whole_word, draw_outline, color_scope, highlight_on_gutter
+    global gutter_icon_type, search_flags, draw_flags, word_separators, word_separators_re_escaped
     global min_active_length, min_active_length_persistent
 
     if not settings:
@@ -78,6 +79,7 @@ def update_settings() -> None:
     highlighter_enabled = bool(settings.get("enabled", True))
     case_sensitive = bool(settings.get("case_sensitive", True))
     whole_word = bool(settings.get("whole_word", True))
+    show_status_message = bool(settings.get("show_status_message", True))
     draw_outline = bool(settings.get("draw_outlined", True))
     color_scope = str(settings.get("color_scope_name", "comment"))
     highlight_on_gutter = bool(settings.get("mark_occurrences_on_gutter", False))
@@ -187,11 +189,11 @@ class CursorWordHighlighterListener(sublime_plugin.EventListener):
             if all(char not in word_separators for char in word_jieba):
                 regions = self.find_regions(view, regions, word_jieba, is_limited_size)
 
-            occurrencesCount = len(regions)
-            if occurrencesCount > 0:
+            occurrences_count = len(regions)
+            if show_status_message and occurrences_count:
                 view.set_status(
                     status_key,
-                    '{} occurrence(s) of "{}"'.format(occurrencesCount, word_jieba),
+                    '{} occurrence(s) of "{}"'.format(occurrences_count, word_jieba),
                 )
 
             view.add_regions(region_key, regions, color_scope, gutter_icon_type, draw_flags)

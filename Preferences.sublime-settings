@@ -3,6 +3,7 @@
     "case_sensitive": false,
     "draw_outlined": true,
     "whole_word": false,
+    "show_status_message": true,
     // valid types: comment, string, invalid, etc
     "color_scope_name": "comment",
     "mark_occurrences_on_gutter": false,
