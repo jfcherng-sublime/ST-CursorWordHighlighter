@@ -33,6 +33,14 @@ It also supports persistent keyword highlight with hotkey assigned
   2 sytle of highlight has been provided, with draw outlined,
   plugin will only draw a outline instead of filling the words, vice versa.
 
+- `"whole_word": false,`
+
+  Only highlight if whole word matches.
+
+- `"show_status_message": true,`
+
+  Show plug-in messages in the status bar.
+
 - `"color_scope_name": "comment",`
 
   This decide the color of highlight, options are`"comment"`, `"string"`,`"invalid"`, etc.
