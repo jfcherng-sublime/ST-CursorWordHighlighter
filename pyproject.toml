@@ -8,6 +8,7 @@ exclude = '''
   \.git |
   libs |
   plugin/libs |
-  stubs
+  stubs |
+  typings
 )/
 '''

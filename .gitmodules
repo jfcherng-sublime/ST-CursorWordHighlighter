@@ -1,6 +1,0 @@
-[submodule "stubs/stubs/st-stubs"]
-	path = stubs/stubs/st-stubs
-	url = https://github.com/jfcherng-sublime/ST-API-stubs
-[submodule "stubs/st-stubs"]
-	path = stubs/st-stubs
-	url = https://github.com/jfcherng-sublime/ST-API-stubs
